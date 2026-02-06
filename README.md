@@ -22,9 +22,9 @@ This library is **agnostic to UI libraries**, so you can use it with **shadcn/ui
 ## Installation
 
 ```bash
-npm install react-autoform
+npm install @pavan-silva/react-autoform
 # or using yarn
-yarn add react-autoform
+yarn add @pavan-silva/react-autoform
 ```
 
 ## Basic Usage
