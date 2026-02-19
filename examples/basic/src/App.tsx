@@ -7,6 +7,8 @@ import type { FieldRendererProps } from "@pavan-silva/react-autoform";
 import React from "react";
 import z from "zod";
 
+import "@pavan-silva/react-autoform/styles.css";
+
 const formDef: AutoFormDefinition = [
   [
     { key: "firstName", label: "First Name", type: "text", required: true },
@@ -40,7 +42,7 @@ const MyInput: React.FC<FieldRendererProps<string | undefined>> = ({
   value,
   onChange,
 }) => (
-  <div style={{ marginBottom: 12 }}>
+  <div>
     <label style={{ display: "block", marginBottom: 6 }}>
       {field.label} (custom)
     </label>
@@ -84,7 +86,7 @@ export default function App() {
         submitLabel="Save"
       />
 
-      <hr />
+      <hr style={{ margin: "20px 0" }} />
 
       <h2>Using default renderers directly</h2>
       <AutoForm definition={formDef} onSubmit={handleSubmit} />

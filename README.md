@@ -82,6 +82,44 @@ import { defaultRenderers, Renderers } from "react-autoform";
 // defaultRenderers.text etc.
 ```
 
+## Optional default CSS
+
+This package ships an **opt-in** CSS file with basic, themeable styles for the built-in renderers. Import it if you want the default look — otherwise the library is completely unstyled and you can provide custom renderers.
+
+Usage:
+
+```js
+// preferred: package subpath (supported by bundlers)
+import "@pavan-silva/react-autoform/styles.css";
+
+// fallback:
+// import "@pavan-silva/react-autoform/dist/styles.css";
+```
+
+The default CSS targets the provided class names (for example `autoform-text`, `autoform-label`, `autoform-submit`) so you can fully override styles in your app CSS or by replacing renderers.
+
+### CSS API — class names & preserved inline styles
+
+The built-in renderers expose a small, stable CSS surface so you can opt in to the default look or fully replace styles. A few inline styles are intentionally preserved on the built-in components to guarantee correct out-of-the-box layout and accessibility.
+
+Key class names (purpose + intentionally preserved inline styles):
+
+| Class                                                                                                                                               | Purpose                                      | Preserved inline styles                                          |
+| --------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- | ---------------------------------------------------------------- |
+| `autoform-container`                                                                                                                                | Top-level wrapper (theme tokens / variables) | —                                                                |
+| `autoform-row`                                                                                                                                      | Row wrapper                                  | `display:flex; gap:12px; margin-bottom:16px;`                    |
+| `autoform-field`                                                                                                                                    | Field container                              | `flex:1; min-width:0;`                                           |
+| `autoform-label`                                                                                                                                    | Field label                                  | `display:block; margin-bottom:8px;`                              |
+| `autoform-text`, `autoform-email`, `autoform-number`, `autoform-password`, `autoform-date`, `autoform-textarea`, `autoform-select`, `autoform-file` | Inputs                                       | `display:block; width:100%; padding:6px; box-sizing:border-box;` |
+| `autoform-checkbox`                                                                                                                                 | Checkbox wrapper                             | `display:flex; align-items:center; gap:8px;`                     |
+| `autoform-error`                                                                                                                                    | Error text                                   | `color:#c53030; margin-top:6px;`                                 |
+| `autoform-submit`                                                                                                                                   | Submit button                                | — (styled via CSS)                                               |
+
+Notes:
+
+- Preserved inline styles apply only to the **built-in** renderers (so the library works OOTB). To change those exact inline rules, provide a custom renderer — that is the supported override path.
+- The optional `styles.css` styles the above class names but cannot override inline styles; use custom renderers for full control.
+
 ## Custom Renderers
 
 You can pass your own components for each field type:
