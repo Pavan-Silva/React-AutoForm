@@ -51,7 +51,8 @@ export default function App() {
     <AutoForm
       definition={formDefinition}
       onSubmit={handleSubmit}
-      submitLabel="Save"
+      /* you can render a custom submit control if you like:
+         renderSubmitButton={({disabled}) => <button disabled={disabled}>Save</button>} */
     />
   );
 }
@@ -59,13 +60,15 @@ export default function App() {
 
 ## Examples
 
-See the `examples/` folder included in this repo for a small Vite + React example that demonstrates:
+See the `examples/` folder included in this repo for small Vite + React demos:
 
-- Using the default renderers
-- Overriding a renderer with your UI system
-- Performance tip: built with `Controller` and memoized renderers to reduce re-renders
+- `basic` — default renderers and how to override them
+- `wizard` — wizard-style flow using `AutoFormWizard` with custom step components
 
-Run the example (inside `examples/basic`):
+Each example shows a simple setup with `react-hook-form` + Zod and builds with
+Vite.
+
+Run a specific example (e.g. basic):
 
 ```bash
 cd examples/basic
@@ -233,16 +236,111 @@ const initialValues = {
 />;
 ```
 
+## Multi‑Step Forms
+
+For more complex flows you can use the `AutoFormWizard` component. It shares
+`react-hook-form` state across all steps and will run validation specific to the
+current step when the user advances. A modern step indicator header is
+rendered automatically when you supply `title` values for each step, showing
+the current, completed, and upcoming stages with a clean, minimal style. Steps
+can either be defined as `AutoFormDefinition` objects or you can supply a
+completely custom React component when you need fine‑grained control.
+
+```ts
+import {
+  AutoFormWizard,
+  AutoFormStep,
+  AutoFormDefinition,
+} from "react-autoform";
+
+const personal: AutoFormDefinition = [
+  { key: "firstName", label: "First Name", type: "text" },
+  { key: "lastName", label: "Last Name", type: "text" },
+];
+
+const address: AutoFormDefinition = [
+  { key: "street", label: "Street", type: "text" },
+  { key: "city", label: "City", type: "text" },
+  { key: "zip", label: "ZIP code", type: "number" },
+];
+
+const steps: AutoFormStep[] = [
+  { key: "personal", title: "Personal info", definition: personal },
+  { key: "address", title: "Address", definition: address },
+  {
+    key: "review",
+    title: "Review",
+    component: ({ formMethods, next, previous }) => {
+      const values = formMethods.getValues();
+      return (
+        <div>
+          <pre>{JSON.stringify(values, null, 2)}</pre>
+          <button type="button" onClick={previous}>
+            Back
+          </button>
+          <button type="button" onClick={next}>
+            Submit
+          </button>
+        </div>
+      );
+    },
+  },
+];
+
+function App() {
+  const handleSubmit = (values: Record<string, unknown>) => {
+    console.log("final submit", values);
+  };
+
+  return (
+    <AutoFormWizard
+      steps={steps}
+      onSubmit={handleSubmit}
+      /* you can override the navigation controls via render props:
+         renderNextButton={({onClick}) => <button onClick={onClick}>→</button>}
+         renderSubmitButton={({onClick}) => <button onClick={onClick}>Finish</button> */
+    />
+  );
+}
+```
+
+The wizard now renders a full‑width step indicator with each title left‑aligned
+and a colored underline showing progress. If you prefer custom markup you can
+pass your own component via the `stepIndicator` prop; it will be given a
+`steps`, `currentIndex` and `totalSteps` object so you can render whatever you
+like.
+
+Each step object also accepts `onNext`/`onPrevious` callbacks that are invoked
+when the user attempts to move between steps. Returning `false` (or a promise
+that resolves to `false`) from `onNext` prevents navigation, which is handy for
+async side‑effects:
+
+```ts
+{
+  definition: personal,
+  onNext: async (values) => {
+    const ok = await saveDraft(values);
+    return ok; // if false, the step won't advance
+  },
+}
+```
+
+The custom `component` variant receives a set of helpers (`next`, `previous`,
+`stepIndex`, etc.) plus the raw `formMethods` object so you can render whatever
+markup or controls you like.
+
 ## Props Overview
 
-| Prop          | Type                                                         | Description                  |
-| ------------- | ------------------------------------------------------------ | ---------------------------- |
-| definition    | `AutoFormDefinition`                                         | The JSON form definition     |
-| initialValues | `Record<string, unknown>` (optional)                         | Default form values          |
-| onSubmit      | `(values: Record<string, unknown>) => void \| Promise<void>` | Called on submit             |
-| submitLabel   | `string` (optional)                                          | Text for submit button       |
-| className     | `string` (optional)                                          | CSS class for form container |
-| renderers     | `AutoFormRenderers` (optional)                               | Custom component renderers   |
+| Prop                 | Type                                                                                       | Description                                                                          |
+| -------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| definition           | `AutoFormDefinition`                                                                       | The JSON form definition                                                             |
+| initialValues        | `Record<string, unknown>` (optional)                                                       | Default form values                                                                  |
+| onSubmit             | `(values: Record<string, unknown>) => void \| Promise<void>`                               | Called on submit                                                                     |
+| renderPreviousButton | `(opts:{onClick:()=>void;disabled:boolean}) => React.ReactNode` (optional)                 | Render prop for a completely custom previous control                                 |
+| renderNextButton     | `(opts:{onClick:()=>void;disabled:boolean;isFinal:boolean}) => React.ReactNode` (optional) | Render prop for a custom next/submit control                                         |
+| renderSubmitButton   | `(opts:{onClick:()=>void;disabled:boolean}) => React.ReactNode` (optional)                 | Render prop used on the final wizard step (takes precedence over `renderNextButton`) |
+| className            | `string` (optional)                                                                        | CSS class for form container                                                         |
+| renderers            | `AutoFormRenderers` (optional)                                                             | Custom component renderers                                                           |
 
 ## Field Types
 
