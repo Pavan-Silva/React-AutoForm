@@ -83,7 +83,21 @@ export default function App() {
         definition={formDef}
         onSubmit={handleSubmit}
         renderers={renderers}
-        submitLabel="Save"
+        renderSubmitButton={({ disabled }) => (
+          <button
+            type="submit"
+            disabled={disabled}
+            style={{
+              background: "teal",
+              color: "#fff",
+              padding: "8px 16px",
+              border: "none",
+              borderRadius: 4,
+            }}
+          >
+            Custom save
+          </button>
+        )}
       />
 
       <hr style={{ margin: "20px 0" }} />
