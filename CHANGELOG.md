@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - 2026-03-27
+
+### Added
+
+- **Type inference** - Full type safety with `defineForm()` and `defineWizard()` helpers for proper literal type preservation
+- **Form data caching** - Optional form state persistence via sessionStorage or localStorage with security features:
+  - Auto-excludes sensitive fields (password, file)
+  - Allowlist support for explicit field control
+  - Auto-expiry (7 days)
+  - Debounced saves
+- **New utility types** - `FormInfer`, `WizardInfer`, `WizardStepValues`, `StepInfer` for manual type extraction
+
+### Changed
+
+- **Unified `actions` prop** - Button rendering now uses `actions={{ renderSubmit }}` for AutoForm and `actions={{ renderPrevious, renderNext, renderSubmit }}` for wizard (replaces individual render props)
+- **UI improvements** - Cleaner stepper design with colored badges, improved input styling
+
+### Breaking Changes
+
+- `renderSubmitButton` prop renamed to `actions.renderSubmit` on AutoForm
+- `renderPreviousButton`, `renderNextButton`, `renderSubmitButton` props replaced with `actions` object on AutoFormWizard
+
+---
+
 ## [1.2.0] - 2026-03-03
 
 ### Added

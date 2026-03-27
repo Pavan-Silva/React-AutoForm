@@ -1,6 +1,6 @@
 import {
   AutoForm,
-  AutoFormDefinition,
+  defineForm,
   defaultRenderers,
 } from "@pavan-silva/react-autoform";
 import type { FieldRendererProps } from "@pavan-silva/react-autoform";
@@ -9,7 +9,7 @@ import z from "zod";
 
 import "@pavan-silva/react-autoform/styles.css";
 
-const formDef: AutoFormDefinition = [
+const formDef = defineForm([
   [
     { key: "firstName", label: "First Name", type: "text", required: true },
     { key: "lastName", label: "Last Name", type: "text" },
@@ -35,7 +35,7 @@ const formDef: AutoFormDefinition = [
     ],
   },
   { key: "accept", label: "Accept Terms", type: "checkbox" },
-];
+]);
 
 const MyInput: React.FC<FieldRendererProps<string | undefined>> = ({
   field,
@@ -62,7 +62,15 @@ const MyInput: React.FC<FieldRendererProps<string | undefined>> = ({
 );
 
 export default function App() {
-  const handleSubmit = (values: Record<string, unknown>) => {
+  const handleSubmit = (values: {
+    firstName: string;
+    lastName?: string;
+    email: string;
+    bio: string;
+    role?: string;
+    accept?: boolean;
+  }) => {
+    // values is fully typed based on the form definition!
     alert(JSON.stringify(values, null, 2));
   };
 
@@ -76,28 +84,32 @@ export default function App() {
       <h1>React AutoForm — Example</h1>
       <p>
         Default renderers are used, but `text` is overridden to show
-        customization.
+        customization. Hover over the form definition to see type inference in
+        action!
       </p>
 
       <AutoForm
         definition={formDef}
         onSubmit={handleSubmit}
         renderers={renderers}
-        renderSubmitButton={({ disabled }) => (
-          <button
-            type="submit"
-            disabled={disabled}
-            style={{
-              background: "teal",
-              color: "#fff",
-              padding: "8px 16px",
-              border: "none",
-              borderRadius: 4,
-            }}
-          >
-            Custom save
-          </button>
-        )}
+        initialValues={{ firstName: "John" }}
+        actions={{
+          renderSubmit: ({ disabled }) => (
+            <button
+              type="submit"
+              disabled={disabled}
+              style={{
+                background: "teal",
+                color: "#fff",
+                padding: "8px 16px",
+                border: "none",
+                borderRadius: 4,
+              }}
+            >
+              Custom save
+            </button>
+          ),
+        }}
       />
 
       <hr style={{ margin: "20px 0" }} />

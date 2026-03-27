@@ -1,30 +1,36 @@
-import React from "react";
 import {
   AutoFormWizard,
-  AutoFormStep,
-  AutoFormDefinition,
+  defineForm,
+  defineWizard,
 } from "@pavan-silva/react-autoform";
 import "@pavan-silva/react-autoform/styles.css";
 
-// simple fields we will reuse
-const personal: AutoFormDefinition = [
+const personal = defineForm([
   { key: "firstName", label: "First Name", type: "text", required: true },
   { key: "lastName", label: "Last Name", type: "text" },
-];
+]);
 
-const address: AutoFormDefinition = [
+const address = defineForm([
   { key: "street", label: "Street", type: "text" },
   { key: "city", label: "City", type: "text" },
   { key: "zip", label: "ZIP", type: "number" },
-];
+]);
 
-const steps: AutoFormStep[] = [
+const steps = defineWizard([
   { key: "personal", title: "Personal", definition: personal },
   { key: "address", title: "Address", definition: address },
   {
     key: "review",
     title: "Review",
-    component: ({ formMethods, previous, next }) => {
+    component: ({
+      formMethods,
+      previous,
+      next,
+    }: {
+      formMethods: any;
+      previous: () => void;
+      next: () => void;
+    }) => {
       const values = formMethods.getValues();
       return (
         <div style={{ whiteSpace: "pre-wrap" }}>
@@ -42,40 +48,36 @@ const steps: AutoFormStep[] = [
       );
     },
   },
-];
+]);
 
 export default function App() {
-  const handleSubmit = (v: Record<string, unknown>) => {
-    alert("final values: " + JSON.stringify(v, null, 2));
+  const handleSubmit = (values: {
+    firstName: string;
+    lastName?: string;
+    street?: string;
+    city?: string;
+    zip?: number;
+  }) => {
+    // values is fully typed from all wizard steps combined!
+    alert("final values: " + JSON.stringify(values, null, 2));
   };
-
-  // tiny custom indicator just to demonstrate the prop
-  const MyIndicator: React.FC<{
-    steps: AutoFormStep[];
-    currentIndex: number;
-    totalSteps: number;
-  }> = ({ steps, currentIndex }) => (
-    <div style={{ textAlign: "center", marginBottom: 16 }}>
-      Step {currentIndex + 1} of {steps.length}
-    </div>
-  );
 
   return (
     <div style={{ maxWidth: 500, margin: "40px auto" }}>
       <h1>Multi‑Step Example</h1>
       <p style={{ marginBottom: 40 }}>
-        A simple three-step wizard using AutoFormWizard.
+        A simple three-step wizard using AutoFormWizard. Hover over the steps
+        definition to see type inference!
       </p>
 
       <AutoFormWizard
         steps={steps}
         onSubmit={handleSubmit}
-        // you can override the buttons via render props:
-        // renderNextButton={({onClick}) => <button onClick={onClick}>→</button>}
-        // renderSubmitButton={({onClick}) => <button onClick={onClick}>Finish</button>}
-
-        // you can use a custom step indicator
-        // stepIndicator={MyIndicator}
+        // you can override buttons via the actions prop:
+        // actions={{
+        //   renderNext: ({onClick}) => <button onClick={onClick}>→</button>,
+        //   renderSubmit: ({onClick}) => <button onClick={onClick}>Finish</button>,
+        // }}
       />
     </div>
   );
