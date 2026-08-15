@@ -37,7 +37,8 @@ yarn add @pavan-silva/react-autoform
 ## Basic Usage
 
 ```ts
-import { AutoForm, defineForm } from "react-autoform";
+import { AutoForm, defineForm } from "@pavan-silva/react-autoform";
+import type { FormInfer } from "@pavan-silva/react-autoform";
 import React from "react";
 
 const formDefinition = defineForm([
@@ -51,7 +52,7 @@ const formDefinition = defineForm([
 
 export default function App() {
   // values is automatically typed based on the form definition
-  const handleSubmit = (values) => {
+  const handleSubmit = (values: FormInfer<typeof formDefinition>) => {
     // TypeScript knows: firstName, lastName are required strings; email is required; bio is optional
     console.log("Form values:", values);
   };
@@ -78,7 +79,8 @@ The library provides powerful type inference out of the box. Use the `defineForm
 Wraps your form definition to preserve literal types for proper inference. Field objects inside the array are contextually typed, so your editor autocompletes every field prop (`key`, `label`, `type`, `required`, `placeholder`, `defaultValue`, `options`, `visibleWhen`, `validator`, `renderer`, …) and flags unknown props:
 
 ```ts
-import { AutoForm, defineForm, row } from "react-autoform";
+import { z } from "zod";
+import { AutoForm, defineForm, row } from "@pavan-silva/react-autoform";
 
 const formDef = defineForm([
   { key: "name", label: "Name", type: "text" },
@@ -117,7 +119,7 @@ const formDef = defineForm([
 Wraps wizard steps for combined type inference:
 
 ```ts
-import { AutoFormWizard, defineForm, defineWizard } from "react-autoform";
+import { AutoFormWizard, defineForm, defineWizard } from "@pavan-silva/react-autoform";
 
 const personal = defineForm([
   { key: "firstName", label: "First Name", type: "text" },
@@ -146,7 +148,7 @@ const steps = defineWizard([
 You can also manually extract types using utility types:
 
 ```ts
-import { FormInfer, WizardInfer, WizardStepValues } from "react-autoform";
+import type { FormInfer, WizardInfer, WizardStepValues } from "@pavan-silva/react-autoform";
 
 // Extract form type from definition
 type FormValues = FormInfer<typeof formDef>;
@@ -233,7 +235,7 @@ const formDef: AutoFormDefinition = [
 **Error display:** validation errors are shown inline under each field by default to improve UX.
 
 ```ts
-const formDef = [
+const formDef: AutoFormDefinition = [
   {
     key: "email",
     label: "Email",
@@ -399,7 +401,8 @@ import {
   AutoFormWizard,
   defineForm,
   defineWizard,
-} from "react-autoform";
+  type WizardInfer,
+} from "@pavan-silva/react-autoform";
 
 const personal = defineForm([
   { key: "firstName", label: "First Name", type: "text" },
@@ -437,7 +440,7 @@ const steps = defineWizard([
 
 function App() {
   // onSubmit receives fully typed values from all steps
-  const handleSubmit = (values) => {
+  const handleSubmit = (values: WizardInfer<typeof steps>) => {
     // values is: { firstName: string; lastName: string; street: string; city: string; zip: number }
     console.log("final submit", values);
   };
@@ -488,7 +491,7 @@ markup or controls you like.
 AutoForm can persist form values to browser storage (sessionStorage or localStorage), allowing users to resume where they left off after a page reload.
 
 ```ts
-import { AutoForm } from "react-autoform";
+import { AutoForm } from "@pavan-silva/react-autoform";
 
 <AutoForm
   cache={{ enabled: true, key: "contact-form" }}
@@ -539,7 +542,7 @@ Cached data is stored as plain JSON in the browser's storage, accessible to:
 ### Exported Cache Utilities
 
 ```ts
-import { loadCachedValues, saveCachedValues, clearCachedValues } from "react-autoform";
+import { loadCachedValues, saveCachedValues, clearCachedValues } from "@pavan-silva/react-autoform";
 
 // Load cached values manually
 const cached = loadCachedValues<MyFormValues>({ enabled: true, key: "my-form" });
@@ -563,13 +566,12 @@ Precedence: `field.renderer` → the `renderers` map → built-in defaults.
 import {
   defineForm,
   AutoForm,
-  AutoFormRenderers,
   type FieldRendererProps,
-} from "react-autoform";
+} from "@pavan-silva/react-autoform";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 
-const MyTextarea = ({ field, value, onChange }: FieldRendererProps) => (
+const MyTextarea = ({ field, value, onChange }: FieldRendererProps<string | undefined>) => (
   <Textarea
     value={value}
     onChange={(e) => onChange(e.target.value)}
@@ -604,7 +606,7 @@ const formDef = defineForm(
 The `renderers` map accepts `Partial<Record<FieldType, FieldRenderer>>`, so you can override or extend the default renderers. The built-in defaults are still exported via `defaultRenderers` if you want to reuse or compose them in your app:
 
 ```ts
-import { defaultRenderers } from "react-autoform";
+import { defaultRenderers } from "@pavan-silva/react-autoform";
 // defaultRenderers.text etc.
 ```
 
@@ -617,11 +619,8 @@ This package ships an **opt-in** CSS file with basic, themeable styles for the b
 Usage:
 
 ```js
-// preferred: package subpath (supported by bundlers)
+// package subpath (supported by bundlers)
 import "@pavan-silva/react-autoform/styles.css";
-
-// fallback:
-// import "@pavan-silva/react-autoform/dist/styles.css";
 ```
 
 The default CSS targets the provided class names (for example `autoform-text`, `autoform-label`, `autoform-submit`) so you can fully override styles in your app CSS or by replacing renderers.

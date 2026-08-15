@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.1] - 2026-08-15
+
+### Added
+
+- **`npm test` in the publish workflow** - CI now runs the unit test suite in addition to `typecheck` and `build` before publishing
+
+### Fixed
+
+- **`WizardInfer` / `WizardStepValues` rejected wizards with component-only steps** - the type constraint only allowed steps with a `definition`, so any wizard containing a custom `component` step failed to typecheck when using these utility types (found while validating the README examples)
+- **`visibleWhen` combined conditions** - when multiple condition keys were set (e.g. `equals` + `notEquals`), only the first key was evaluated. All provided keys must now match, matching the documented behavior ("all of them must match"); regression tests added
+
+### Docs
+
+- **README examples validated against the published package** - every code sample now typechecks as written:
+  - Correct package name (`@pavan-silva/react-autoform`) in all imports
+  - `handleSubmit` callbacks annotated with `FormInfer` / `WizardInfer`
+  - Added the missing `zod` import to the type-inference sample
+  - Custom renderer example uses `FieldRendererProps<string | undefined>` and drops the unused `AutoFormRenderers` import
+  - Validation example annotates the definition with `AutoFormDefinition`
+  - Removed the invalid `dist/styles.css` import fallback (only the `./styles.css` subpath is exported)
+
+---
+
 ## [2.1.0] - 2026-08-14
 
 ### Added
